@@ -7,8 +7,12 @@
 //
 
 #import "ToolView.h"
-#import <Masonry.h>
 #import "ImagePickerTools.h"
+#if __has_include(<Masonry.h>)
+#import <Masonry.h>
+#else
+#import "Masonry.h"
+#endif
 
 @interface ToolView ()
 

@@ -8,8 +8,12 @@
 
 #import "PreviewVideoCell.h"
 #import <AVFoundation/AVFoundation.h>
-#import <Masonry.h>
 #import <Photos/Photos.h>
+#if __has_include(<Masonry.h>)
+#import <Masonry.h>
+#else
+#import "Masonry.h"
+#endif
 
 @interface VideoView : UIView
 

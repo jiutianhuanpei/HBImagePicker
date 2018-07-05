@@ -10,7 +10,11 @@
 #import <Photos/Photos.h>
 #import "ImagePickerManager.h"
 #import "SHBImageView.h"
+#if __has_include(<Masonry.h>)
 #import <Masonry.h>
+#else
+#import "Masonry.h"
+#endif
 
 @interface PreviewImageCell ()
 

@@ -24,8 +24,8 @@ Pod::Spec.new do |s|
   
   s.dependency  'Masonry' #这个是此库依赖的三方库
   s.dependency  'MBProgressHUD' #这个是此库依赖的三方库
-  #s.xcconfig = {
-  # 'USER_HEADER_SEARCH_PATHS' => '$(inherited) $(SRCROOT)/HYMediator'  #这个是配置路径，如果本库有依赖与三方的文件，需要配置这个，否则报错
-  #}
+  s.xcconfig = {
+  'USER_HEADER_SEARCH_PATHS' => '$(inherited) $(SRCROOT)/Masonry $(SRCROOT)/MBProgressHUD'  #这个是配置路径，如果本库有依赖与三方的文件，需要配置这个，否则报错
+  }
 
 end

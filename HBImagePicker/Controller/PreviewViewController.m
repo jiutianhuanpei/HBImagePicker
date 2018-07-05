@@ -9,10 +9,14 @@
 #import "PreviewViewController.h"
 #import "PreviewImageCell.h"
 #import "PreviewVideoCell.h"
-#import <Masonry.h>
 #import "ToolView.h"
 #import "ImagePickerManager.h"
 #import "ImagePickerTools.h"
+#if __has_include(<Masonry.h>)
+#import <Masonry.h>
+#else
+#import "Masonry.h"
+#endif
 
 @interface PreviewViewController ()<UICollectionViewDelegateFlowLayout, UICollectionViewDataSource>
 
