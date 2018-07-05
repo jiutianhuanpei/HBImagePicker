@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/jiutianhuanpei/HBImagePicker.git", :tag => s.version }
 
   s.source_files  = "HBImagePicker/Controller/*", "HBImagePicker/Manager/*","HBImagePicker/Model/*","HBImagePicker/Tools/*","HBImagePicker/View/*"
-  s.resources  = "HBImagePicker/Resource/*.png"
+  s.resources  = ["HBImagePicker/Resource/*.png"]
   s.frameworks = "AVFoundation", "ImageIO", "Photos", "UIKit"
   s.requires_arc = true
   
