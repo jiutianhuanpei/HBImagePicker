@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "AssetModel.h"
+#import "ImagePickerEnum.h"
 
 @interface ImagePickerController : UINavigationController
 
@@ -16,7 +17,8 @@
 - (instancetype)init;
 
 @property (nonatomic, copy) NSString *(^selectToast)(AssetModel *willSelectModel, NSArray <AssetModel *>*selectedArray);
-@property (nonatomic, copy) NSString *(^ensureToast)(NSArray <AssetModel *>*selectedArray);
+@property (nonatomic, copy) void(^ensureToast)(NSArray <AssetModel *>*selectedArray);
+@property (nonatomic, assign) HBSelectType selectType;
 
 
 @end

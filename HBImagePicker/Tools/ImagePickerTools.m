@@ -75,6 +75,32 @@
     
 }
 
++ (NSAttributedString *)videoDurationStringWith:(NSTimeInterval)duration {
+    
+    static NSDateFormatter *formatter = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        formatter = [[NSDateFormatter alloc] init];
+        formatter.dateFormat = @"mm:ss";
+    });
+    
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:duration];
+    NSString *str = [formatter stringFromDate:date];
+    
+    UIImage *icon = [UIImage imageNamed:@"icon_video"];
+    NSTextAttachment *attchment = [[NSTextAttachment alloc] initWithData:nil ofType:nil];
+    attchment.image = icon;
+    
+    
+    NSAttributedString *imgAtt = [NSAttributedString attributedStringWithAttachment:attchment];
+    NSAttributedString *timeAtt = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" %@", str] attributes:@{NSFontAttributeName : [UIFont systemFontOfSize:12], NSForegroundColorAttributeName : UIColor.whiteColor, NSBaselineOffsetAttributeName : @2}];
+    
+    NSMutableAttributedString *attStr = [[NSMutableAttributedString alloc] initWithAttributedString:imgAtt];
+    [attStr appendAttributedString:timeAtt];
+        
+    return attStr;
+}
+
 /*
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.

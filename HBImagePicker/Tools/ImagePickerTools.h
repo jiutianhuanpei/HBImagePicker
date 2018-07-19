@@ -18,4 +18,6 @@ typedef UIImage GIFImage;
 
 + (void)toast:(NSString *)toast toView:(UIView *)view;
 
++ (NSAttributedString *)videoDurationStringWith:(NSTimeInterval)duration;
+
 @end

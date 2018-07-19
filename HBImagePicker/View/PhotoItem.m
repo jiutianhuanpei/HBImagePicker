@@ -6,22 +6,27 @@
 //  Copyright © 2018年 沈红榜. All rights reserved.
 //
 
-#import "ImageCell.h"
+#import "PhotoItem.h"
+#import "ImagePickerManager.h"
+#import "ImagePickerTools.h"
 #if __has_include(<Masonry.h>)
 #import <Masonry.h>
 #else
 #import "Masonry.h"
 #endif
 
-@interface ImageCell ()
+@interface PhotoItem ()
 
 @property (nonatomic, strong) UIImageView *imgView;
 @property (nonatomic, strong) UIImageView *gifTip;
 @property (nonatomic, strong) UIButton    *selectBtn;
+@property (nonatomic, strong) UIView      *maskView;
+@property (nonatomic, strong) UILabel     *timeLbl;
+
 
 @end
 
-@implementation ImageCell
+@implementation PhotoItem
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
@@ -30,6 +35,8 @@
         [self addSubview:self.imgView];
         [self addSubview:self.gifTip];
         [self addSubview:self.selectBtn];
+        [self addSubview:self.maskView];
+        [self addSubview:self.timeLbl];
         
         __weak typeof(self) SHB = self;
         
@@ -44,8 +51,15 @@
         [_selectBtn mas_makeConstraints:^(MASConstraintMaker *make) {
 
             make.right.mas_equalTo(SHB.mas_right).offset(-2);
-            make.bottom.mas_equalTo(SHB.mas_bottom).offset(-2);
+            make.top.mas_equalTo(SHB.mas_top).offset(2);
             make.size.mas_equalTo(CGSizeMake(27, 27));
+        }];
+        [_maskView mas_makeConstraints:^(MASConstraintMaker *make) {
+           make.top.left.bottom.right.mas_equalTo(0);
+        }];
+        
+        [_timeLbl mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.bottom.right.mas_equalTo(0);
         }];
     }
     return self;
@@ -56,6 +70,13 @@
     _model = asset;
     
     _gifTip.hidden = !asset.bIsGif;
+    _selectBtn.hidden = asset.bIsVideo && ImagePickerManager.sharedInstance.selectType == HBSelectSingleMediaType;
+    
+    if (asset.bIsVideo) {
+        _maskView.hidden = ImagePickerManager.sharedInstance.bCanSelectVideo;
+    } else {
+        _maskView.hidden = true;
+    }
     
     switch (asset.type) {
         case AssetTypeNormal:
@@ -69,6 +90,7 @@
     }
     
     PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
+    options.resizeMode = PHImageRequestOptionsResizeModeExact;
     
     __weak typeof(self) SHB = self;
     [PHImageManager.defaultManager requestImageForAsset:asset.asset targetSize:self.bounds.size contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
@@ -76,6 +98,13 @@
             SHB.imgView.image = result;
         });
     }];
+    
+    if (asset.bIsVideo) {
+        _timeLbl.hidden = false;
+        _timeLbl.attributedText = [ImagePickerTools videoDurationStringWith:asset.asset.duration];
+    } else {
+        _timeLbl.hidden = true;
+    }
     
 }
 
@@ -113,7 +142,6 @@
 - (UIImageView *)imgView {
     if (!_imgView) {
         _imgView = [[UIImageView alloc] initWithFrame:CGRectZero];
-        _imgView.contentMode = UIViewContentModeScaleToFill;
     }
     return _imgView;
 }
@@ -133,6 +161,24 @@
         [_selectBtn addTarget:self action:@selector(clickedBtn:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _selectBtn;
+}
+
+- (UIView *)maskView {
+    if (!_maskView) {
+        _maskView = [[UIView alloc] initWithFrame:CGRectZero];
+        _maskView.backgroundColor = [UIColor.blackColor colorWithAlphaComponent:0.5];
+    }
+    return _maskView;
+}
+
+- (UILabel *)timeLbl {
+    if (!_timeLbl) {
+        _timeLbl = [[UILabel alloc] initWithFrame:CGRectZero];
+        _timeLbl.font = [UIFont systemFontOfSize:14];
+        _timeLbl.textColor = UIColor.orangeColor;
+        _timeLbl.textAlignment = NSTextAlignmentCenter;
+    }
+    return _timeLbl;
 }
 
 @end

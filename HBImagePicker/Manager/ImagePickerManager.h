@@ -10,6 +10,7 @@
 #import <Photos/Photos.h>
 #import "GroupAssetModel.h"
 #import "AssetModel.h"
+#import "ImagePickerEnum.h"
 
 @interface ImagePickerManager : NSObject
 
@@ -18,8 +19,10 @@
 + (instancetype)sharedInstance;
 
 @property (nonatomic, copy) NSString *(^selectToast)(AssetModel *willSelectModel, NSArray <AssetModel *>*selectedArray);
-@property (nonatomic, copy) NSString *(^ensureToast)(NSArray <AssetModel *>*selectedArray);
+@property (nonatomic, copy) void(^ensureToast)(NSArray <AssetModel *>*selectedArray);
+@property (nonatomic, assign) HBSelectType selectType;
 
+@property (nonatomic, assign) BOOL bCanSelectVideo;
 
 - (void)fetchCollection:(void(^)(NSArray <GroupAssetModel *>*array))handler;
 @property (nonatomic, strong, readonly) NSArray <GroupAssetModel *>*groupAssetArray;

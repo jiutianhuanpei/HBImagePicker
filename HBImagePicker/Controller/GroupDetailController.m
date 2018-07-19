@@ -7,8 +7,7 @@
 //
 
 #import "GroupDetailController.h"
-#import "ImageCell.h"
-#import "VideoCell.h"
+#import "PhotoItem.h"
 #import "ImagePickerManager.h"
 #import "PreviewViewController.h"
 #import "ImagePickerTools.h"
@@ -138,13 +137,7 @@ CGFloat k_space = 5;
         
     ImagePickerManager *manager = ImagePickerManager.sharedInstance;
     
-    NSString *toast = !manager.ensureToast ? @"" : manager.ensureToast(array);
-    
-    if (toast.length > 0) {
-        NSLog(@"确定失败： %@", toast);
-        [ImagePickerTools toast:toast toView:self.view];
-        return;
-    }
+    !manager.ensureToast ?: manager.ensureToast(array);
     
     [self dismiss];
 }
@@ -152,25 +145,15 @@ CGFloat k_space = 5;
 #pragma mark - <UICollectionViewDelegate, UICollectionViewDataSource>
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     
-    UICollectionViewCell *cell = nil;
     AssetModel *model = _allAssets[indexPath.row];
-
-    if (model.bIsVideo) {
-        
-        cell = [collectionView dequeueReusableCellWithReuseIdentifier:NSStringFromClass(VideoCell.class) forIndexPath:indexPath];
-        [(VideoCell *)cell configModel:model];
-        
-    } else {
-        
-        cell = [collectionView dequeueReusableCellWithReuseIdentifier:NSStringFromClass(ImageCell.class) forIndexPath:indexPath];
-        [(ImageCell *)cell configModel:model];
-        
-        __weak typeof(self) SHB = self;
-        [(ImageCell *)cell setSelectToast:^NSString *(BOOL willSelect, ImageCell *item) {
-            NSString *toast = [SHB selectAssetToast:willSelect cell:item];
-            return toast;
-        }];
-    }    
+    PhotoItem *cell = [collectionView dequeueReusableCellWithReuseIdentifier:NSStringFromClass(PhotoItem.class) forIndexPath:indexPath];
+    [cell configModel:model];
+    
+    __weak typeof(self) SHB = self;
+    [cell setSelectToast:^NSString *(BOOL willSelect, PhotoItem *item) {
+        NSString *toast = [SHB selectAssetToast:willSelect cell:item];
+        return toast;
+    }];
     return cell;
 }
 
@@ -188,6 +171,16 @@ CGFloat k_space = 5;
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     
+    
+    ImagePickerManager *manager = ImagePickerManager.sharedInstance;
+    
+    AssetModel *model = _allAssets[indexPath.item];
+
+    if (model.bIsVideo && !manager.bCanSelectVideo) {
+        return;
+    }
+    
+    
     PreviewViewController *VC = [[PreviewViewController alloc] initWithDataSource:_allAssets currentIndex:indexPath];
     VC.selectDic = _selectDic;
     VC.selectArray = _selectArray;
@@ -202,15 +195,34 @@ CGFloat k_space = 5;
 }
 
 #pragma mark - 图片是否可选
-- (NSString *)selectAssetToast:(BOOL)willSelect cell:(ImageCell *)cell {
+- (NSString *)selectAssetToast:(BOOL)willSelect cell:(PhotoItem *)cell {
     
     NSString *key = cell.model.asset.localIdentifier;
-    
+    ImagePickerManager *manager = ImagePickerManager.sharedInstance;
+
     if (!willSelect) {
         //取消选择
         _selectDic[key] = nil;
         [_selectArray removeObject:key];
         [self changeEnsureBtn];
+        
+        if (_selectArray.count == 0) {
+            manager.bCanSelectVideo = true;
+            
+            NSArray *videoCells = [_col.visibleCells filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.model.bIsVideo = %d", true]];
+            
+            if (videoCells.count > 0) {
+                
+                NSMutableArray *indexArray = [NSMutableArray arrayWithCapacity:0];
+                
+                for (UICollectionViewCell *cell in videoCells) {
+                    NSIndexPath *index = [_col indexPathForCell:cell];
+                    [indexArray addObject:index];
+                }
+                [_col reloadItemsAtIndexPaths:indexArray];
+            }
+        }
+        
         return nil;
     }
     
@@ -221,7 +233,6 @@ CGFloat k_space = 5;
         [array addObject:model];
     }
     
-    ImagePickerManager *manager = ImagePickerManager.sharedInstance;
     
     NSString *toast = !manager.selectToast ? nil : manager.selectToast(cell.model, array);
     
@@ -234,6 +245,27 @@ CGFloat k_space = 5;
     _selectDic[key] = cell.model;
     [_selectArray addObject:key];
     [self changeEnsureBtn];
+    
+    //屏蔽视频
+    if (manager.selectType == HBSelectSingleMediaType && !cell.model.bIsVideo && manager.bCanSelectVideo) {
+        // 只能选单一类型时，选择图片，可选视频
+        manager.bCanSelectVideo = false;
+        
+        NSArray *videoCells = [_col.visibleCells filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self.model.bIsVideo = %d", true]];
+        
+        if (videoCells.count > 0) {
+            
+            NSMutableArray *indexArray = [NSMutableArray arrayWithCapacity:0];
+            
+            for (UICollectionViewCell *cell in videoCells) {
+                NSIndexPath *index = [_col indexPathForCell:cell];
+                [indexArray addObject:index];
+            }
+            [_col reloadItemsAtIndexPaths:indexArray];
+        }
+    }
+    
+    
     return nil;
 }
 
@@ -262,8 +294,7 @@ CGFloat k_space = 5;
         _col = [[UICollectionView alloc] initWithFrame:self.view.bounds collectionViewLayout:layout];
         _col.backgroundColor = UIColor.whiteColor;
         
-        [_col registerClass:VideoCell.class forCellWithReuseIdentifier:NSStringFromClass(VideoCell.class)];
-        [_col registerClass:ImageCell.class forCellWithReuseIdentifier:NSStringFromClass(ImageCell.class)];
+        [_col registerClass:PhotoItem.class forCellWithReuseIdentifier:NSStringFromClass(PhotoItem.class)];
         _col.delegate = self;
         _col.dataSource = self;
         

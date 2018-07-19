@@ -48,7 +48,17 @@
     
     //choose_photo_n choose_photo_h
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageNamed:@"choose_photo_n"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self action:@selector(selectImage:)];
+    AssetModel *model = _dataSource[_currentIndex.item];
+    
+    if (model.bIsVideo && ImagePickerManager.sharedInstance.selectType == HBSelectSingleMediaType) {
+        self.navigationItem.rightBarButtonItem = nil;
+    } else {
+        
+        NSString *imgName = model.type == AssetTypeNormal ? @"choose_photo_n" : @"choose_photo_h";
+        
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageNamed:imgName] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] style:UIBarButtonItemStylePlain target:self action:@selector(selectImage:)];
+    }
+    
 
     [self.view addSubview:self.col];
     [self.view addSubview:self.toolView];
@@ -105,7 +115,6 @@
         NSString *toast = !manager.selectToast ? nil : manager.selectToast(currentCell.model, _selectDic.allValues);
         
         if (toast.length > 0) {
-            NSLog(@"这个不能选 ： %@", toast);
             [ImagePickerTools toast:toast toView:self.view];
             return;
         }
@@ -155,36 +164,24 @@
     
     if (array.count == 0) {
         
-        UICollectionViewCell *cell = _col.visibleCells.firstObject;
+        NSIndexPath *currentIndex = _col.indexPathsForVisibleItems.firstObject;
+        AssetModel *model = _dataSource[currentIndex.item];
         
-        AssetModel *model = nil;
-        
-        if ([cell isKindOfClass:PreviewImageCell.class]) {
-            model = [(PreviewImageCell *)cell model];
-        } else {
-            model = [(PreviewVideoCell *)cell model];
-        }
-        
-        NSString *toast = !manager.ensureToast ? @"" : manager.ensureToast(@[model]);
-        
+        NSString *toast = !manager.selectToast ? nil : manager.selectToast(model, nil);
         if (toast.length > 0) {
             [ImagePickerTools toast:toast toView:self.view];
-            NSLog(@"确定失败： %@", toast);
             return;
         }
+        
+        !manager.ensureToast ?: manager.ensureToast(@[model]);
+        
         [self dismissViewControllerAnimated:true completion:nil];
         return;
     }
         
     
-    NSString *toast = !manager.ensureToast ? @"" : manager.ensureToast(array);
-    
-    if (toast.length > 0) {
-        [ImagePickerTools toast:toast toView:self.view];
-        NSLog(@"确定失败： %@", toast);
-        return;
-    }
-    
+    !manager.ensureToast ?: manager.ensureToast(array);
+        
     [self dismissViewControllerAnimated:true completion:nil];
 }
 
@@ -220,8 +217,13 @@
     return UIEdgeInsetsMake(5, 5, 5, 5);
 }
 
-- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
-    PreviewImageCell *item = (PreviewImageCell *)cell;
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    PreviewImageCell *item = (PreviewImageCell *)_col.visibleCells.firstObject;
+    
+    if (item.model.bIsVideo && ImagePickerManager.sharedInstance.selectType == HBSelectSingleMediaType) {
+        self.navigationItem.rightBarButtonItem = nil;
+        return;
+    }
     
     UIImage *image = nil;
     
@@ -231,7 +233,6 @@
         image = [[UIImage imageNamed:@"choose_photo_h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
     }
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStylePlain target:self action:@selector(selectImage:)];
-    
 }
 
 

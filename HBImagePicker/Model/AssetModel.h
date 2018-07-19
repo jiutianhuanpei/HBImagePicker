@@ -12,7 +12,6 @@
 typedef NS_ENUM(NSUInteger, AssetType) {
     AssetTypeNormal,
     AssetTypeSelected,
-    AssetTypeDisable,
 };
 
 @interface AssetModel : NSObject

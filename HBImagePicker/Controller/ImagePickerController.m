@@ -23,9 +23,9 @@
 }
 
 - (instancetype)init {
-    
-    GroupListViewController *VC = [[GroupListViewController alloc] init];
 
+    ImagePickerManager.sharedInstance.bCanSelectVideo = true;
+    GroupListViewController *VC = [[GroupListViewController alloc] init];
     
     self = [super initWithRootViewController:VC];
     if (self) {
@@ -41,9 +41,14 @@
     ImagePickerManager.sharedInstance.selectToast = selectToast;
 }
 
-- (void)setEnsureToast:(NSString *(^)(NSArray<AssetModel *> *))ensureToast {
+- (void)setEnsureToast:(void(^)(NSArray<AssetModel *> *))ensureToast {
     _ensureToast = ensureToast;
     ImagePickerManager.sharedInstance.ensureToast = ensureToast;
+}
+
+- (void)setSelectType:(HBSelectType)selectType {
+    _selectType = selectType;
+    ImagePickerManager.sharedInstance.selectType = selectType;
 }
 
 - (void)viewDidLoad {

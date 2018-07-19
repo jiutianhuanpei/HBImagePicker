@@ -49,10 +49,14 @@
 - (void)configModel:(GroupAssetModel *)col {
     
     PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
+    options.resizeMode = PHImageRequestOptionsResizeModeExact;
     
-    [PHImageManager.defaultManager requestImageForAsset:col.coverAsset targetSize:CGSizeMake(100, 100) contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+    [PHImageManager.defaultManager requestImageForAsset:col.coverAsset targetSize:CGSizeMake(70, 70) contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
 
-        self.imgView.image = result;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            self.imgView.image = result;
+        });
     }];
     
     _titleLbl.text = [NSString stringWithFormat:@"%@（%ld）", col.collection.localizedTitle, (long)col.totalNum];
@@ -71,7 +75,6 @@
 - (UIImageView *)imgView {
     if (!_imgView) {
         _imgView = [[UIImageView alloc] initWithFrame:CGRectZero];
-        _imgView.contentMode = UIViewContentModeScaleToFill;
     }
     return _imgView;
 }

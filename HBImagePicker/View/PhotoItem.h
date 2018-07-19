@@ -9,11 +9,11 @@
 #import <UIKit/UIKit.h>
 #import "AssetModel.h"
 
-@interface ImageCell : UICollectionViewCell
+@interface PhotoItem : UICollectionViewCell
 
 @property (nonatomic, strong, readonly) AssetModel *model;
 
-@property (nonatomic, copy) NSString *(^selectToast)(BOOL willSelect, ImageCell *cell);
+@property (nonatomic, copy) NSString *(^selectToast)(BOOL willSelect, PhotoItem *cell);
 
 - (void)configModel:(AssetModel *)asset;
 
