@@ -123,5 +123,40 @@
     
     }];
 }
+- (void)fetchVideoWithAsset:(PHAsset *)asset handler:(void (^)(NSString *, NSData *))handler {
+    
+    NSArray *array = [PHAssetResource assetResourcesForAsset:asset];
+    
+    PHAssetResource *resource = nil;
+    
+    for (PHAssetResource *temp in array) {
+        if (temp.type == PHAssetResourceTypeVideo) {
+            resource = temp;
+            break;
+        }
+    }
+    
+    if (!resource) {
+        !handler ?: handler(nil, nil);
+        return;
+    }
+    
+    
+    PHAssetResourceRequestOptions *options = [[PHAssetResourceRequestOptions alloc] init];
+    options.networkAccessAllowed = true;
+    
+    NSMutableData *resultData = [NSMutableData dataWithCapacity:0];
+    
+    [PHAssetResourceManager.defaultManager requestDataForAssetResource:resource options:options dataReceivedHandler:^(NSData * _Nonnull data) {
+        [resultData appendData:data];
+    } completionHandler:^(NSError * _Nullable error) {
+        
+        if (error) {
+            !handler ?: handler(nil, nil);
+        } else {
+            !handler ?: handler(resource.originalFilename, resultData);
+        }
+    }];
+}
 
 @end

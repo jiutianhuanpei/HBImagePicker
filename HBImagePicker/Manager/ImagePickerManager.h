@@ -30,5 +30,6 @@
 - (PHFetchResult<PHAsset *>*)fetchAssetsWithCollection:(PHAssetCollection *)coll;
 
 - (void)fetchOriginalImageWithAsset:(PHAsset *)asset handler:(void(^)(UIImage *image))handler;
+- (void)fetchVideoWithAsset:(PHAsset *)asset handler:(void(^)(NSString *fileName, NSData *mediaData))handler;
 
 @end
