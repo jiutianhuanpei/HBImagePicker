@@ -60,7 +60,9 @@
         NSMutableArray *allGroupArray = [NSMutableArray arrayWithCapacity:0];
         [systemArray enumerateObjectsUsingBlock:^(PHAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             if ([obj.localizedTitle isEqualToString:@"所有照片"] ||
-                [obj.localizedTitle isEqualToString:@"All Photos"]) {
+                [obj.localizedTitle isEqualToString:@"All Photos"] ||
+                [obj.localizedTitle isEqualToString:@"相机胶卷"] ||
+                [obj.localizedTitle isEqualToString:@"Camera Roll"]) {
                 self->_allPhotoCollection = obj;
                 [allGroupArray insertObject:obj atIndex:0];
             } else {
