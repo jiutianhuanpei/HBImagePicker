@@ -59,15 +59,7 @@
         
         NSMutableArray *allGroupArray = [NSMutableArray arrayWithCapacity:0];
         [systemArray enumerateObjectsUsingBlock:^(PHAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if ([obj.localizedTitle isEqualToString:@"所有照片"] ||
-                [obj.localizedTitle isEqualToString:@"All Photos"] ||
-                [obj.localizedTitle isEqualToString:@"相机胶卷"] ||
-                [obj.localizedTitle isEqualToString:@"Camera Roll"]) {
-                self->_allPhotoCollection = obj;
-                [allGroupArray insertObject:obj atIndex:0];
-            } else {
-                [allGroupArray addObject:obj];
-            }
+            [allGroupArray addObject:obj];
         }];
         
         [userArray enumerateObjectsUsingBlock:^(PHAssetCollection * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -75,6 +67,8 @@
         }];
         
         NSMutableArray *groupArray = [NSMutableArray arrayWithCapacity:0];//用于过滤空相册
+        
+        NSInteger allColNum = 0;
         
         for (PHAssetCollection *col in allGroupArray) {
             
@@ -89,8 +83,19 @@
             model.collection = col;
             model.coverAsset = allAsset.firstObject;
             model.totalNum = allAsset.count;
-            [groupArray addObject:model];
+            
+            
+            if (allColNum <= allAsset.count) {
+                self->_allPhotoCollection = col;
+                allColNum = allAsset.count;
+                [groupArray insertObject:model atIndex:0];
+            } else {
+                [groupArray addObject:model];
+            }
         }
+        
+        
+        
         dispatch_async(dispatch_get_main_queue(), ^{
             self->_groupAssetArray = groupArray;
             !handler ?: handler(groupArray);
