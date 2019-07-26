@@ -20,7 +20,11 @@
     // Do any additional setup after loading the view.
     self.view.backgroundColor = UIColor.whiteColor;
     
-    
+    UIButton *btn = [UIButton buttonWithType:UIButtonTypeContactAdd];
+    [btn sizeToFit];
+    [btn addTarget:self action:@selector(showImagePicker) forControlEvents:UIControlEventTouchUpInside];
+    btn.center = self.view.center;
+    [self.view addSubview:btn];
     
 }
 
@@ -28,19 +32,17 @@
     
     ImagePickerController *picker = ImagePickerController.new;
     
-    [self presentViewController:picker animated:true];
+    [picker setEnsureToast:^(NSArray<AssetModel *> *selectedArray) {
+        
+        NSLog(@"select Images: \n%@", selectedArray);
+        
+    }];
+    
+    [self presentViewController:picker animated:true completion:nil];
     
     
 }
 
-/*
-#pragma mark - Navigation
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end
