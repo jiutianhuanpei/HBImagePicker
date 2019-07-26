@@ -36,7 +36,7 @@ xcuserdata/
 #
 Pods/
 Podfile.lock
-.xcworkspace
+*.xcworkspace
 
 # Carthage
 #
