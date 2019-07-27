@@ -88,40 +88,49 @@ CGFloat k_space = 5;
 
 - (void)reloadUI {
     
-    
     [_allAssets removeAllObjects];
     
     if (_group) {
-        self.navigationItem.title = _group.collection.localizedTitle;
-
-        PHFetchResult<PHAsset *>*fetchResult = [ImagePickerManager.sharedInstance fetchAssetsWithCollection:_group.collection];
-        __weak typeof(self) SHB = self;
-        [fetchResult enumerateObjectsUsingBlock:^(PHAsset * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-           
-            AssetModel *model = [[AssetModel alloc] init];
-            model.asset = obj;
-            model.type = AssetTypeNormal;
-            [SHB.allAssets addObject:model];
-            
-        }];
-        [_col reloadData];
+        
+        [self configGroup:_group];
     } else {
         [ImagePickerManager.sharedInstance fetchCollection:^(NSArray<GroupAssetModel *> *array) {
             
-            self.navigationItem.title = ImagePickerManager.sharedInstance.allPhotoCollection.localizedTitle;
-            PHFetchResult<PHAsset *>*fetchResult = [ImagePickerManager.sharedInstance fetchAssetsWithCollection:ImagePickerManager.sharedInstance.allPhotoCollection];
-            __weak typeof(self) SHB = self;
-            [fetchResult enumerateObjectsUsingBlock:^(PHAsset * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                
-                AssetModel *model = [[AssetModel alloc] init];
-                model.asset = obj;
-                model.type = AssetTypeNormal;
-                [SHB.allAssets addObject:model];
-                
-            }];
-            [SHB.col reloadData];
+            [self configGroup:ImagePickerManager.sharedInstance.mainGroup];
+            
+//            self.navigationItem.title = ImagePickerManager.sharedInstance.allPhotoCollection.localizedTitle;
+//            PHFetchResult<PHAsset *>*fetchResult = [ImagePickerManager.sharedInstance fetchAssetsWithCollection:ImagePickerManager.sharedInstance.allPhotoCollection];
+//            __weak typeof(self) SHB = self;
+//            [fetchResult enumerateObjectsUsingBlock:^(PHAsset * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+//                
+//                AssetModel *model = [[AssetModel alloc] init];
+//                model.asset = obj;
+//                model.type = AssetTypeNormal;
+//                [SHB.allAssets addObject:model];
+//                
+//            }];
+//            [SHB.col reloadData];
         }];
     }
+}
+
+- (void)configGroup:(GroupAssetModel *)group {
+    
+    [_allAssets removeAllObjects];
+    
+    self.navigationItem.title = group.collection.localizedTitle;
+    
+    PHFetchResult<PHAsset *>*fetchResult = [ImagePickerManager.sharedInstance fetchAssetsWithCollection:group.collection];
+    __weak typeof(self) SHB = self;
+    [fetchResult enumerateObjectsUsingBlock:^(PHAsset * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        
+        AssetModel *model = [[AssetModel alloc] init];
+        model.asset = obj;
+        model.type = AssetTypeNormal;
+        [SHB.allAssets addObject:model];
+        
+    }];
+    [_col reloadData];
 }
 
 - (void)clickedToolViewEnsureBtn {

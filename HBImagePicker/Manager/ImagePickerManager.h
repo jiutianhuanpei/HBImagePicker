@@ -14,7 +14,7 @@
 
 @interface ImagePickerManager : NSObject
 
-@property (nonatomic, strong, readonly) PHAssetCollection *allPhotoCollection;
+@property (nonatomic, strong, readonly) GroupAssetModel *mainGroup;
 
 + (instancetype)sharedInstance;
 

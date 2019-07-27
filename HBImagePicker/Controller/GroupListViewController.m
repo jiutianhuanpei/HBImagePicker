@@ -79,6 +79,7 @@
         _tableView.dataSource = self;
         _tableView.delegate = self;
         _tableView.rowHeight = [GroupListCell rowHeight];
+        _tableView.tableFooterView = UIView.new;
     }
     return _tableView;
 }

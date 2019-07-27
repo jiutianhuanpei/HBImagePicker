@@ -49,12 +49,11 @@
 
 - (void)fetchCollection:(void(^)(NSArray <GroupAssetModel *>*array))handler {
     
-    PHFetchOptions *options = [[PHFetchOptions alloc] init];
     
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        PHFetchResult<PHAssetCollection *>*systemArray = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:options];
+        PHFetchResult<PHAssetCollection *>*systemArray = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeSmartAlbumUserLibrary options:nil];
         
-        PHFetchResult<PHAssetCollection *>*userArray = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeSmartAlbumUserLibrary options:options];
+        PHFetchResult<PHAssetCollection *>*userArray = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
         
         
         NSMutableArray *allGroupArray = [NSMutableArray arrayWithCapacity:0];
@@ -68,12 +67,9 @@
         
         NSMutableArray *groupArray = [NSMutableArray arrayWithCapacity:0];//用于过滤空相册
         
-        NSInteger allColNum = 0;
-        
         for (PHAssetCollection *col in allGroupArray) {
             
-            
-            PHFetchResult <PHAsset *>* allAsset = [PHAsset fetchAssetsInAssetCollection:col options:options];
+            PHFetchResult <PHAsset *>* allAsset = [PHAsset fetchAssetsInAssetCollection:col options:nil];
             
             if (allAsset.count == 0) {
                 continue;
@@ -84,17 +80,13 @@
             model.coverAsset = allAsset.firstObject;
             model.totalNum = allAsset.count;
             
-            
-            if (allColNum <= allAsset.count) {
-                self->_allPhotoCollection = col;
-                allColNum = allAsset.count;
+            if (col.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumUserLibrary) {
                 [groupArray insertObject:model atIndex:0];
+                self->_mainGroup = model;
             } else {
                 [groupArray addObject:model];
             }
         }
-        
-        
         
         dispatch_async(dispatch_get_main_queue(), ^{
             self->_groupAssetArray = groupArray;
