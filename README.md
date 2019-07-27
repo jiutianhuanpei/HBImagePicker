@@ -1,6 +1,7 @@
 ---
 <h3>HBImagePicker</h3>
 
+![](https://img.shields.io/cocoapods/v/HBImagePicker)
 
 > 示例代码
 
@@ -41,3 +42,20 @@ if (asset.mediaType == PHAssetMediaTypeVideo) {
 	}];
 }
 ```
+
+* 注：
+
+其中 `SHBImageView` 是自己封装的播放GIF的一个View
+
+| API | 作用 |
+|---|---|
+`- (void)configGifImageData:(NSData *)gifData` | 配置要播放的图片二进制数据
+`- (void)beginGif` | 开始播放图片
+`- (void)stopGif` | 停止播放
+
+
+
+
+
+
+
